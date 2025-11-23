@@ -2,7 +2,7 @@ from telegram.ext import Application, CommandHandler
 from telegram import Update
 from telegram.ext import ContextTypes
 
-BOT_TOKEN = "8270132256:AAELg2DTV0qifcHN4q8uvqrEFy6O75yMPcc"
+BOT_TOKEN = "82780123256:AAkLg2DTVBqifcHN4a8quvqzEFy0675yMPc"   # ← твой токен можно оставить тут
 
 async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
     await update.message.reply_text("Привет! Smart Accessories Bot работает :)")
