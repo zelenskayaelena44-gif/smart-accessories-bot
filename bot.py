@@ -1,9 +1,18 @@
 from telegram.ext import Application, CommandHandler
+from telegram import Update
+from telegram.ext import ContextTypes
 
-async def start(update, context):
-    await update.message.reply_text("Привет! Я Smart Accessories Bot.")
+BOT_TOKEN = "8270132256:AAELg2DTV0qifcHN4q8uvqrEFy6O75yMPcc"
 
-app = Application.builder().token("8270132256:AAELg2DTV0qifcHN4q8uvqrEFy6O75yMPcc").build()
-app.add_handler(CommandHandler("start", start))
+async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    await update.message.reply_text("Привет! Smart Accessories Bot работает :)")
 
-app.run_polling()
+def main():
+    app = Application.builder().token(BOT_TOKEN).build()
+
+    app.add_handler(CommandHandler("start", start))
+
+    app.run_polling()
+
+if __name__ == "__main__":
+    main()
