@@ -1,20 +1,17 @@
-from telegram.ext import Updater, CommandHandler
 from telegram import Update
-from telegram.ext import CallbackContext
+from telegram.ext import ApplicationBuilder, CommandHandler, ContextTypes
 
-BOT_TOKEN = "8270132256:AAELg2DTV0qifcHN4q8uvqrEFy6O75yMPcc"
+TOKEN = "8270132256:AAELg2DTV0qifcHN4q8uvqrEFy6O75yMPcc"
 
-def start(update: Update, context: CallbackContext):
-    update.message.reply_text("Привет! Smart Accessories Bot работает :)")
+async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    await update.message.reply_text("Привет! Бот работает 😊")
 
 def main():
-    updater = Updater(BOT_TOKEN, use_context=True)
-    dp = updater.dispatcher
+    app = ApplicationBuilder().token(TOKEN).build()
 
-    dp.add_handler(CommandHandler("start", start))
+    app.add_handler(CommandHandler("start", start))
 
-    updater.start_polling()
-    updater.idle()
+    app.run_polling()
 
 if __name__ == "__main__":
     main()
