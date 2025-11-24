@@ -11,8 +11,7 @@ logging.basicConfig(
 logger = logging.getLogger(__name__)
 
 # --- ЗМІННІ СЕРЕДОВИЩА ---
-
-# 🛑 ВИПРАВЛЕНО: Читаємо назву змінної "BOT_TOKEN", а не саме значення.
+# Зчитуємо ЗНАЧЕННЯ змінної середовища з НАЗВОЮ "BOT_TOKEN"
 BOT_TOKEN = os.environ.get("BOT_TOKEN") 
 # Порт, який надає Render
 PORT = int(os.environ.get("PORT", 8080))
@@ -36,7 +35,6 @@ async def help_command(update: Update, context: ContextTypes.DEFAULT_TYPE) -> No
 async def handle_message(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
     """Обробляє текстові повідомлення."""
     # Тут має бути логіка Вашого ланцюжка Telegram-бота!
-    # Наприклад, відповідь на запит "хочу MagSafe"
     text = update.message.text
     if "MagSafe" in text or "хочу" in text:
         await update.message.reply_text("Чудовий вибір! MagSafe — це автоматичне вирівнювання та швидка зарядка. Переходжу до каталогу...")
@@ -49,8 +47,8 @@ async def handle_message(update: Update, context: ContextTypes.DEFAULT_TYPE) -> 
 def main() -> None:
     """Запускає бота у режимі WebHook."""
     
+    # ПЕРЕВІРКА, яка раніше давала помилку, тепер має спрацювати успішно!
     if not BOT_TOKEN or not WEBHOOK_URL:
-        # Перевірка має знайти значення змінної, встановлене на Render
         logger.error("КРИТИЧНА ПОМИЛКА: BOT_TOKEN або WEBHOOK_URL не визначені. Перевірте змінні середовища Render.")
         return
 
