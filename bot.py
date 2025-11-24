@@ -1,16 +1,16 @@
 import os
 import logging
-from telegram import Update
+from telegram import Update, Bot # <-- Додаємо імпорт Bot
 from telegram.ext import (
     Application,
     CommandHandler,
     ContextTypes,
     MessageHandler,
     filters,
-    Updater # <-- Клас, необхідний для run_webhook у PTB 20+
+    Updater 
 )
 
-# Налаштування логування (дуже важливо для діагностики на Render)
+# Налаштування логування
 logging.basicConfig(
     format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
     level=logging.INFO
@@ -18,7 +18,6 @@ logging.basicConfig(
 logger = logging.getLogger(__name__)
 
 # --- ЗМІННІ СЕРЕДОВИЩА ---
-# Важливо: Зчитуємо назву змінної, а не її значення!
 BOT_TOKEN = os.environ.get("BOT_TOKEN") 
 PORT = int(os.environ.get("PORT", 8080))
 WEBHOOK_URL = os.environ.get("WEBHOOK_URL") 
@@ -39,7 +38,6 @@ async def help_command(update: Update, context: ContextTypes.DEFAULT_TYPE) -> No
 
 async def handle_message(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
     """Обробляє текстові повідомлення."""
-    # Базова логіка (можна розширити до повного ланцюжка)
     text = update.message.text
     if text and ("MagSafe" in text or "хочу" in text):
         await update.message.reply_text("Чудовий вибір! MagSafe — це автоматичне вирівнювання та швидка зарядка. Переходжу до каталогу...")
@@ -52,27 +50,34 @@ async def handle_message(update: Update, context: ContextTypes.DEFAULT_TYPE) -> 
 def main() -> None:
     """Запускає бота у режимі WebHook на Render."""
     
-    # КРИТИЧНА ПЕРЕВІРКА: чи зчитані змінні середовища
     if not BOT_TOKEN or not WEBHOOK_URL:
         logger.error("КРИТИЧНА ПОМИЛКА: BOT_TOKEN або WEBHOOK_URL не визначені. Перевірте змінні середовища Render.")
         return
 
-    # 1. Створення Application (з Updater для коректної роботи run_webhook)
-    # Це виправляє RuntimeError: Application.run_webhook is only available if the application has an Updater.
-    application = Application.builder().token(BOT_TOKEN).updater(Updater).build() 
+    # 1. Створення об'єкта Bot та передача токена
+    bot_obj = Bot(BOT_TOKEN)
 
-    # 2. Реєстрація обробників
+    # 2. Створення Application З ВИКОРИСТАННЯМ Updater, але БЕЗ токена в ланцюжку
+    # Це обходить внутрішній конфлікт і вирішує RuntimeError.
+    application = (
+        Application.builder()
+        .bot(bot_obj) # <-- Передаємо об'єкт Bot
+        .updater(Updater) # <-- Встановлюємо Updater
+        .build()
+    )
+
+    # 3. Реєстрація обробників
     application.add_handler(CommandHandler("start", start))
     application.add_handler(CommandHandler("help", help_command))
     application.add_handler(MessageHandler(filters.TEXT & ~filters.COMMAND, handle_message))
     
-    # 3. Запуск у режимі WebHook
+    # 4. Запуск у режимі WebHook
     logger.info(f"Запуск бота на WebHook URL: {WEBHOOK_URL} з портом: {PORT}")
 
     application.run_webhook(
-        listen="0.0.0.0",  # Слухаємо всі інтерфейси
-        port=PORT,         # Порт, наданий Render
-        url_path=BOT_TOKEN, # Використовуємо токен як шлях для безпеки
+        listen="0.0.0.0", 
+        port=PORT,         
+        url_path=BOT_TOKEN, 
         webhook_url=f"{WEBHOOK_URL}/{BOT_TOKEN}"
     )
 
