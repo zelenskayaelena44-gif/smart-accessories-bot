@@ -11,7 +11,7 @@ app = Application.builder().token(BOT_TOKEN).build()
 
     app.add_handler(CommandHandler("start", start))
 
-    app.run_polling()
+    app.run_webhook()
 
 if __name__ == "__main__":
     main()
