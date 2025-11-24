@@ -1,67 +1,61 @@
 import os
 import logging
-from telegram import Update, Bot # <-- Додаємо Bot
-from telegram.ext import (
-    Application,
-    CommandHandler,
-    ContextTypes,
-    MessageHandler,
-    filters,
-    Updater # <-- Додаємо Updater
-)
-import sys # <-- Для діагностики
+from telegram import Update
+from telegram.ext import Application, CommandHandler, ContextTypes, MessageHandler, filters
 
-# Налаштування логування
-logging.basicConfig(format='%(asctime)s - %(name)s - %(levelname)s - %(message)s', level=logging.INFO)
+# Настройка логирования
+logging.basicConfig(
+    format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
+    level=logging.INFO
+)
 logger = logging.getLogger(__name__)
 
-# --- ЗМІННІ СЕРЕДОВИЩА ---
-BOT_TOKEN = os.environ.get("BOT_TOKEN") 
-PORT = int(os.environ.get("PORT", 8080))
-WEBHOOK_URL = os.environ.get("WEBHOOK_URL") 
+# --- Переменные (токен можно вставить прямо сюда для простоты) ---
+# Для максимальной простоты вставьте токен прямо здесь:
+BOT_TOKEN = "ВАШ_ТОКЕН_ОТ_BOTFATHER" # <-- Замените на Ваш токен в кавычках!
 
+# --- Функции-обработчики ---
 
-# --- ФУНКЦІЇ-ОБРОБНИКИ (ПРИКЛАД) ---
 async def start(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
+    """Обрабатывает команду /start и запускает приветствие."""
     user = update.effective_user
-    await update.message.reply_html(f"Привіт, {user.mention_html()}! Я ваш консультант...")
+    await update.message.reply_html(
+        f"Привет, {user.mention_html()}! Я ваш консультант из Smart Accessories. Готов помочь с MagSafe!",
+    )
 
-# ... [Інші функції] ...
+async def handle_message(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
+    """Обрабатывает текстовые сообщения (простая логика)."""
+    text = update.message.text
+    if text and ("MagSafe" in text or "хочу" in text):
+        # Здесь будет логика Вашего диалогового цепочки
+        await update.message.reply_text("Отличный выбор! Перехожу к каталогу и скидкам.")
+    else:
+        await update.message.reply_text("Я — простой бот. Если у Вас сложный вопрос, лучше нажмите /start и выберите опцию.")
 
-# --- ГОЛОВНА ФУНКЦІЯ ЗАПУСКУ ---
+
+# --- ГЛАВНАЯ ФУНКЦИЯ ЗАПУСКА ---
+
 def main() -> None:
-    # 📌 ДІАГНОСТИКА: Перевірка, чи коректно працює Python
-    if sys.version_info < (3, 8):
-        logger.error("КРИТИЧНА ПОМИЛКА: Необхідний Python 3.8+.")
+    """Запускает бота в режиме Long Polling (Опрос)."""
+    
+    if BOT_TOKEN == "8270132256:AAELg2DTV0qifcHN4q8uvqrEFy6O75yMPcc":
+        logger.error("КРИТИЧЕСКАЯ ОШИБКА: Замените 'ВАШ_ТОКЕН_ОТ_BOTFATHER' на реальный токен!")
         return
     
-    if not BOT_TOKEN or not WEBHOOK_URL:
-        logger.error("КРИТИЧНА ПОМИЛКА: BOT_TOKEN або WEBHOOK_URL не визначені.")
-        return
+    # 1. Создание Application
+    # В Long Polling не нужен Updater, поэтому .build() работает без ошибок.
+    application = Application.builder().token(BOT_TOKEN).build() 
 
-    # 1. Створення Application (обхід конфлікту)
-    # Створюємо об'єкт Bot окремо, щоб обійти конфлікт RuntimeError
-    bot_obj = Bot(BOT_TOKEN) 
-    application = (
-        Application.builder()
-        .bot(bot_obj) 
-        .updater(Updater) # Встановлюємо Updater
-        .build()
-    )
-
-    # 2. Реєстрація обробників
+    # 2. Регистрация обработчиков
     application.add_handler(CommandHandler("start", start))
-    # ... [додайте інші обробники] ...
+    application.add_handler(MessageHandler(filters.TEXT & ~filters.COMMAND, handle_message))
     
-    # 3. Запуск у режимі WebHook
-    logger.info(f"Запуск бота на WebHook URL: {WEBHOOK_URL} з портом: {PORT}")
+    # 3. Запуск в режиме Long Polling
+    logger.info("Запуск бота в режиме Long Polling...")
+    
+    # Этот метод просто начинает опрос Telegram-серверов.
+    application.run_polling(poll_interval=3.0) 
 
-    application.run_webhook(
-        listen="0.0.0.0", 
-        port=PORT,         
-        url_path=BOT_TOKEN, 
-        webhook_url=f"{WEBHOOK_URL}/{BOT_TOKEN}"
-    )
 
 if __name__ == '__main__':
     main()
