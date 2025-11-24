@@ -12,7 +12,7 @@ logger = logging.getLogger(__name__)
 
 # --- Переменные (токен можно вставить прямо сюда для простоты) ---
 # Для максимальной простоты вставьте токен прямо здесь:
-BOT_TOKEN = "ВАШ_ТОКЕН_ОТ_BOTFATHER" # <-- Замените на Ваш токен в кавычках!
+BOT_TOKEN = "8270132256:AAELg2DTV0qifcHN4q8uvqrEFy6O75yMPcc" # <-- Замените на Ваш токен в кавычках!
 
 # --- Функции-обработчики ---
 
@@ -38,7 +38,7 @@ async def handle_message(update: Update, context: ContextTypes.DEFAULT_TYPE) -> 
 def main() -> None:
     """Запускает бота в режиме Long Polling (Опрос)."""
     
-    if BOT_TOKEN == "8270132256:AAELg2DTV0qifcHN4q8uvqrEFy6O75yMPcc":
+    if BOT_TOKEN == "ВАШ_ТОКЕН_ОТ_BOTFATHER":
         logger.error("КРИТИЧЕСКАЯ ОШИБКА: Замените 'ВАШ_ТОКЕН_ОТ_BOTFATHER' на реальный токен!")
         return
     
