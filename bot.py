@@ -53,7 +53,7 @@ def main() -> None:
         return
 
     # 1. Створення Application
-    application = Application.builder().token(BOT_TOKEN).build()
+  application = Application.builder().token(BOT_TOKEN).updater(None).build()
 
     # 2. Реєстрація обробників
     application.add_handler(CommandHandler("start", start))
