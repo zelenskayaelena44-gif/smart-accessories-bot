@@ -11,11 +11,12 @@ logging.basicConfig(
 logger = logging.getLogger(__name__)
 
 # --- ЗМІННІ СЕРЕДОВИЩА ---
-# Токен бота
-BOT_TOKEN = os.environ.get("8270132256:AAELg2DTV0qifcHN4q8uvqrEFy6O75yMPcc")
+
+# 🛑 ВИПРАВЛЕНО: Читаємо назву змінної "BOT_TOKEN", а не саме значення.
+BOT_TOKEN = os.environ.get("BOT_TOKEN") 
 # Порт, який надає Render
 PORT = int(os.environ.get("PORT", 8080))
-# URL, який надає Render (наприклад: https://your-service-name.onrender.com/)
+# URL, який надає Render
 WEBHOOK_URL = os.environ.get("WEBHOOK_URL") 
 
 
@@ -49,8 +50,7 @@ def main() -> None:
     """Запускає бота у режимі WebHook."""
     
     if not BOT_TOKEN or not WEBHOOK_URL:
-        # Ця перевірка спричиняла помилку "BOT_TOKEN або WEBHOOK_URL не визначені."
-        # Ви маєте виправити змінні середовища на Render!
+        # Перевірка має знайти значення змінної, встановлене на Render
         logger.error("КРИТИЧНА ПОМИЛКА: BOT_TOKEN або WEBHOOK_URL не визначені. Перевірте змінні середовища Render.")
         return
 
@@ -63,17 +63,15 @@ def main() -> None:
     application.add_handler(MessageHandler(filters.TEXT & ~filters.COMMAND, handle_message))
     
     # 3. Запуск у режимі WebHook
-    # Render вимагає саме таку конфігурацію: слухати 0.0.0.0 на наданому PORT
     logger.info(f"Запуск бота на WebHook URL: {WEBHOOK_URL} з портом: {PORT}")
 
     application.run_webhook(
         listen="0.0.0.0", 
         port=PORT,         
-        url_path=BOT_TOKEN, # Використовуємо токен як шлях для безпеки
+        url_path=BOT_TOKEN, 
         webhook_url=f"{WEBHOOK_URL}/{BOT_TOKEN}"
     )
 
 
 if __name__ == '__main__':
-    # Фіксуємо IndentationError: переконайтеся, що всі відступи в файлі коректні!
     main()
